@@ -1,14 +1,18 @@
 import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, InputNumber, Radio, Space, Typography } from "antd";
+import { Button, Input, InputNumber, Radio, Space } from "antd";
 import { useEffect, useState } from "react";
 import "./App.css";
 import { DummyData } from "./jsonData";
 
 const App = () => {
+  const [numInText, setNumInText] = useState("");
+  const [number, setNumber] = useState(0);
   const [bracelets, setBracelets] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [checkedItemIDs, setCheckedItemIDs] = useState([]);
   const [value, setValue] = useState(1);
-  const [checkedItems, setCheckedItems] = useState();
+  const [checkedBraceletsLength, setCheckedBraceletsLength] = useState(0);
+  const [checkedQuestionsLength, setCheckedQuestionsLength] = useState(0);
 
   useEffect(() => {
     setBracelets(
@@ -19,43 +23,60 @@ const App = () => {
     );
   }, []);
 
-  const handleChangeForBracelets = (e) => {
+  const handleChange = (e, type) => {
     const { name, checked } = e.target;
-    if (name === "allSelect") {
-      let tempBracelets = bracelets.map((bracelet) => {
-        return { ...bracelet, isChecked: checked };
-      });
-      setBracelets(tempBracelets);
+
+    if (type === "Bracelets") {
+      if (name === "allSelect") {
+        setBracelets(
+          bracelets.map((bracelet) => ({ ...bracelet, isChecked: checked }))
+        );
+      } else {
+        const index = bracelets.findIndex((bracelet) => bracelet.name === name);
+        setBracelets([
+          ...bracelets.slice(0, index),
+          { ...bracelets[index], isChecked: checked },
+          ...bracelets.slice(index + 1),
+        ]);
+      }
     } else {
-      let tempBracelets = bracelets.map((bracelet) =>
-        bracelet.name === name ? { ...bracelet, isChecked: checked } : bracelet
-      );
-      setBracelets(tempBracelets);
+      if (name === "allSelect") {
+        setQuestions(
+          questions.map((question) => ({ ...question, isChecked: checked }))
+        );
+      } else {
+        const index = questions.findIndex((question) => question.name === name);
+        setQuestions([
+          ...questions.slice(0, index),
+          { ...questions[index], isChecked: checked },
+          ...questions.slice(index + 1),
+        ]);
+      }
     }
+
+    const checkedBracelets = bracelets.filter((bracelet) => bracelet.isChecked);
+    const checkedQuestions = questions.filter((question) => question.isChecked);
+
+    setCheckedBraceletsLength(checkedBracelets.length);
+    setCheckedQuestionsLength(checkedQuestions.length);
+
+    const braceletIDs = checkedBracelets.map((bracelet) => bracelet.id);
+    const questionIDs = checkedQuestions.map((question) => question.id);
+
+    setCheckedItemIDs([...braceletIDs, ...questionIDs]);
   };
 
-  const handleChangeForQuestions = (e) => {
-    const { name, checked } = e.target;
-    if (name === "allSelect") {
-      let tempQuestions = questions.map((question) => {
-        return { ...question, isChecked: checked };
-      });
-      setQuestions(tempQuestions);
-    } else {
-      let tempQuestions = questions.map((question) =>
-        question.name === name ? { ...question, isChecked: checked } : question
-      );
-      setQuestions(tempQuestions);
-    }
-  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  const radioHandleChange = (e) => {
-    console.log("radio checked", e.target.value);
-    setValue(e.target.value);
-  };
+    const taxInfo = {
+      applicable_items: checkedItemIDs,
+      applied_to: value === 1 ? "all" : "some",
+      name: numInText,
+      rate: number / 100,
+    };
 
-  const onChange = (value) => {
-    console.log("changed", value);
+    console.log("taxInfo", taxInfo);
   };
 
   return (
@@ -65,22 +86,31 @@ const App = () => {
           <p>Add Tax</p>
           <p>x</p>
         </div>
-        <form>
+        <form onSubmit={(e) => handleSubmit(e)}>
           <div className="num-inputs">
-            <Input placeholder="Basic usage" />
+            <Input
+              placeholder="Basic usage"
+              onChange={(e) => setNumInText(e.target.value)}
+              value={numInText}
+            />
             <Space>
               <InputNumber
                 defaultValue={0}
+                min={0}
                 formatter={(value) =>
                   `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
                 parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-                onChange={onChange}
+                onChange={(val) => setNumber(val)}
+                value={number}
               />
             </Space>
           </div>
           <div className="rad-inputs">
-            <Radio.Group onChange={radioHandleChange} value={value}>
+            <Radio.Group
+              onChange={(e) => setValue(e.target.value)}
+              value={value}
+            >
               <Space direction="vertical">
                 <Radio value={1}>Apply to all items in collection</Radio>
                 <Radio value={2}>Apply to specific items</Radio>
@@ -99,21 +129,23 @@ const App = () => {
               // checked={
               //   users.filter((user) => user?.isChecked !== true).length < 1
               // }
-              checked={!bracelets.some((brclts) => brclts?.isChecked !== true)}
-              onChange={handleChangeForBracelets}
+              checked={
+                !bracelets.some((bracelet) => bracelet?.isChecked !== true)
+              }
+              onChange={(e) => handleChange(e, "Bracelets")}
             />
             <label className="form-check-label ms-2">Bracelets</label>
           </div>
-          {bracelets.map((brclts, index) => (
+          {bracelets.map((bracelet, index) => (
             <div className="form-check childrens" key={index}>
               <input
                 type="checkbox"
                 className="form-check-input"
-                name={brclts.name}
-                checked={brclts?.isChecked || false}
-                onChange={handleChangeForBracelets}
+                name={bracelet.name}
+                checked={bracelet?.isChecked || false}
+                onChange={(e) => handleChange(e, "Bracelets")}
               />
-              <label className="form-check-label ms-2">{brclts.name}</label>
+              <label className="form-check-label ms-2">{bracelet.name}</label>
             </div>
           ))}
           <div className="form-check parent">
@@ -124,30 +156,30 @@ const App = () => {
               // checked={
               //   users.filter((user) => user?.isChecked !== true).length < 1
               // }
-              checked={!questions.some((qustns) => qustns?.isChecked !== true)}
-              onChange={handleChangeForQuestions}
+              checked={
+                !questions.some((question) => question?.isChecked !== true)
+              }
+              onChange={(e) => handleChange(e, "Questions")}
             />
             <label className="form-check-label ms-2"></label>
           </div>
-          {questions.map((qustns, index) => (
+          {questions.map((question, index) => (
             <div className="form-check childrens" key={index}>
               <input
                 type="checkbox"
                 className="form-check-input"
-                name={qustns.name}
-                checked={qustns?.isChecked || false}
-                onChange={handleChangeForQuestions}
+                name={question.name}
+                checked={question?.isChecked || false}
+                onChange={(e) => handleChange(e, "Questions")}
               />
-              <label className="form-check-label ms-2">{qustns.name}</label>
+              <label className="form-check-label ms-2">{question.name}</label>
             </div>
           ))}
           <hr />
           <div className="input-button">
             <Space wrap>
-              <Button className="warning">
-                Apply tax to{" "}
-                {bracelets.map((bracelet) => bracelet.isChecked).length +
-                  questions.map((question) => question.isChecked).length}{" "}
+              <Button htmlType="submit" className="warning">
+                Apply tax to {checkedBraceletsLength + checkedQuestionsLength}{" "}
                 item(s)
               </Button>
             </Space>
@@ -159,37 +191,3 @@ const App = () => {
 };
 
 export default App;
-
-{
-  /* <div className="content">
-  <div className="header">
-    <h1>Add Tax</h1>
-    <h1>x</h1>
-  </div>
-  <form>
-    <div className="form">
-      <div className="form">
-        <div className="left">
-          <input type="text" className="outline-none" />
-        </div>
-        <div className="right">
-          <input type="number" className="outline-none" min="0" />
-          <span>%</span>
-        </div>
-      </div>
-    </div>
-    <div className="radio-list">
-      <div className="form-control">
-        <input type="radio" name="rad" id="" />
-        <label htmlFor="">Apply to all items in collection</label>
-      </div>
-      <div className="form-control">
-        <input type="radio" name="rad" id="" />
-        <label htmlFor="">Apply to specific items</label>
-      </div>
-    </div>
-  </form>
-  <hr />
-</div>;
- */
-}
