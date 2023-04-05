@@ -95,7 +95,15 @@ const App = () => {
           })}
           onSubmit={handleSubmit}
         >
-          {({ values, handleChange, setFieldValue, errors, touched }) => (
+          {({
+            values,
+            handleChange,
+            setFieldValue,
+            errors,
+            touched,
+            isValid,
+            isSubmitting,
+          }) => (
             <Form>
               <div className="num-inputs">
                 <Input
@@ -104,6 +112,7 @@ const App = () => {
                   onChange={handleChange}
                   value={values.numberInText}
                 />
+                {errors.name && touched.name && <div>{errors.name}</div>}
                 <Space>
                   <InputNumber
                     defaultValue={0}
@@ -115,6 +124,7 @@ const App = () => {
                     onChange={(val) => setFieldValue("rate", val)}
                     value={values.rate}
                   />
+                  {errors.name && touched.name && <div>{errors.name}</div>}
                 </Space>
               </div>
               <div className="rad-inputs">
@@ -204,7 +214,11 @@ const App = () => {
               <hr />
               <div className="input-button">
                 <Space wrap>
-                  <Button className="warning" htmlType="submit">
+                  <Button
+                    className="warning"
+                    htmlType="submit"
+                    disabled={!isValid || isSubmitting}
+                  >
                     Apply tax to item(s)
                   </Button>
                 </Space>
