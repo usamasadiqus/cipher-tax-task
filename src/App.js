@@ -1,5 +1,5 @@
-import { UserOutlined } from "@ant-design/icons";
-import { Input, InputNumber, Button, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import { Button, Input, InputNumber, Radio, Space, Typography } from "antd";
 import { useEffect, useState } from "react";
 import "./App.css";
 import { DummyData } from "./jsonData";
@@ -7,6 +7,8 @@ import { DummyData } from "./jsonData";
 const App = () => {
   const [bracelets, setBracelets] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [value, setValue] = useState(1);
+  const [checkedItems, setCheckedItems] = useState();
 
   useEffect(() => {
     setBracelets(
@@ -20,31 +22,36 @@ const App = () => {
   const handleChangeForBracelets = (e) => {
     const { name, checked } = e.target;
     if (name === "allSelect") {
-      let tempBrclts = bracelets.map((brclts) => {
-        return { ...brclts, isChecked: checked };
+      let tempBracelets = bracelets.map((bracelet) => {
+        return { ...bracelet, isChecked: checked };
       });
-      setBracelets(tempBrclts);
+      setBracelets(tempBracelets);
     } else {
-      let tempBrclts = bracelets.map((brclts) =>
-        brclts.name === name ? { ...brclts, isChecked: checked } : brclts
+      let tempBracelets = bracelets.map((bracelet) =>
+        bracelet.name === name ? { ...bracelet, isChecked: checked } : bracelet
       );
-      setBracelets(tempBrclts);
+      setBracelets(tempBracelets);
     }
   };
 
   const handleChangeForQuestions = (e) => {
     const { name, checked } = e.target;
     if (name === "allSelect") {
-      let tempQustns = questions.map((qustns) => {
-        return { ...qustns, isChecked: checked };
+      let tempQuestions = questions.map((question) => {
+        return { ...question, isChecked: checked };
       });
-      setQuestions(tempQustns);
+      setQuestions(tempQuestions);
     } else {
-      let tempQustns = questions.map((qustns) =>
-        qustns.name === name ? { ...qustns, isChecked: checked } : qustns
+      let tempQuestions = questions.map((question) =>
+        question.name === name ? { ...question, isChecked: checked } : question
       );
-      setQuestions(tempQustns);
+      setQuestions(tempQuestions);
     }
+  };
+
+  const radioHandleChange = (e) => {
+    console.log("radio checked", e.target.value);
+    setValue(e.target.value);
   };
 
   const onChange = (value) => {
@@ -53,73 +60,100 @@ const App = () => {
 
   return (
     <div className="container">
-      <Input placeholder="Basic usage" />
-      <Input placeholder="Basic usage" />
-      <Space>
-        <InputNumber
-          defaultValue={1000}
-          formatter={(value) =>
-            `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-          }
-          parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
-          onChange={onChange}
-        />
-      </Space>
-      <Input placeholder="default size" prefix={<UserOutlined />} />
-      <hr />
-      <div className="form-check">
-        <input
-          type="checkbox"
-          className="form-check-input"
-          name="allSelect"
-          // checked={
-          //   users.filter((user) => user?.isChecked !== true).length < 1
-          // }
-          checked={!bracelets.some((brclts) => brclts?.isChecked !== true)}
-          onChange={handleChangeForBracelets}
-        />
-        <label className="form-check-label ms-2">Bracelets</label>
-      </div>
-      {bracelets.map((brclts, index) => (
-        <div className="form-check" key={index}>
-          <input
-            type="checkbox"
-            className="form-check-input"
-            name={brclts.name}
-            checked={brclts?.isChecked || false}
-            onChange={handleChangeForBracelets}
-          />
-          <label className="form-check-label ms-2">{brclts.name}</label>
+      <div className="main-content">
+        <div className="header">
+          <p>Add Tax</p>
+          <p>x</p>
         </div>
-      ))}
-      <div className="form-check">
-        <input
-          type="checkbox"
-          className="form-check-input"
-          name="allSelect"
-          // checked={
-          //   users.filter((user) => user?.isChecked !== true).length < 1
-          // }
-          checked={!questions.some((qustns) => qustns?.isChecked !== true)}
-          onChange={handleChangeForQuestions}
-        />
-        <label className="form-check-label ms-2"></label>
+        <form>
+          <div className="num-inputs">
+            <Input placeholder="Basic usage" />
+            <Space>
+              <InputNumber
+                defaultValue={0}
+                formatter={(value) =>
+                  `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(value) => value.replace(/\$\s?|(,*)/g, "")}
+                onChange={onChange}
+              />
+            </Space>
+          </div>
+          <div className="rad-inputs">
+            <Radio.Group onChange={radioHandleChange} value={value}>
+              <Space direction="vertical">
+                <Radio value={1}>Apply to all items in collection</Radio>
+                <Radio value={2}>Apply to specific items</Radio>
+              </Space>
+            </Radio.Group>
+          </div>
+          <hr />
+          <div className="search-inputs">
+            <Input placeholder="Search Items" prefix={<SearchOutlined />} />
+          </div>
+          <div className="form-check parent">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              name="allSelect"
+              // checked={
+              //   users.filter((user) => user?.isChecked !== true).length < 1
+              // }
+              checked={!bracelets.some((brclts) => brclts?.isChecked !== true)}
+              onChange={handleChangeForBracelets}
+            />
+            <label className="form-check-label ms-2">Bracelets</label>
+          </div>
+          {bracelets.map((brclts, index) => (
+            <div className="form-check childrens" key={index}>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                name={brclts.name}
+                checked={brclts?.isChecked || false}
+                onChange={handleChangeForBracelets}
+              />
+              <label className="form-check-label ms-2">{brclts.name}</label>
+            </div>
+          ))}
+          <div className="form-check parent">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              name="allSelect"
+              // checked={
+              //   users.filter((user) => user?.isChecked !== true).length < 1
+              // }
+              checked={!questions.some((qustns) => qustns?.isChecked !== true)}
+              onChange={handleChangeForQuestions}
+            />
+            <label className="form-check-label ms-2"></label>
+          </div>
+          {questions.map((qustns, index) => (
+            <div className="form-check childrens" key={index}>
+              <input
+                type="checkbox"
+                className="form-check-input"
+                name={qustns.name}
+                checked={qustns?.isChecked || false}
+                onChange={handleChangeForQuestions}
+              />
+              <label className="form-check-label ms-2">{qustns.name}</label>
+            </div>
+          ))}
+          <hr />
+          <div className="input-button">
+            <Space wrap>
+              <Button className="warning">
+                Apply tax to{" "}
+                {bracelets.map((bracelet) => bracelet.isChecked).length +
+                  questions.map((question) => question.isChecked).length}{" "}
+                item(s)
+              </Button>
+            </Space>
+          </div>
+        </form>
       </div>
-      {questions.map((qustns, index) => (
-        <div className="form-check" key={index}>
-          <input
-            type="checkbox"
-            className="form-check-input"
-            name={qustns.name}
-            checked={qustns?.isChecked || false}
-            onChange={handleChangeForQuestions}
-          />
-          <label className="form-check-label ms-2">{qustns.name}</label>
-        </div>
-      ))}
-      <Space wrap>
-        <Button className="warning">Primary Button</Button>
-      </Space>
     </div>
   );
 };

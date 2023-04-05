@@ -2,70 +2,76 @@
   height: 100vh;
 }
 
-.container .content {
-  margin: 4rem 12rem;
-  /* border: 1px solid #000; */
-}
-
-.container .content .header {
+.container .main-content {
+  width: 60%;
   display: flex;
-  font-weight: 300;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem auto;
 }
 
-.container .content .header + form {
-  margin: 1rem 0;
-}
-
-.container .content .form {
-  display: flex;
-  margin: 0.65rem 0;
-  width: 500px;
-  gap: 10px;
-}
-
-.container .content .form input {
-  padding: 5px;
-  border: none;
-}
-
-.container .content .form .left {
-  width: 75%;
-  border-radius: 5px;
-  border: 1px solid black;
-}
-
-.container .content .form > * > input {
+.container .main-content .header {
   width: 100%;
-}
-
-.container .content .form .right {
-  width: 25%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid black;
-  padding-right: 10px;
-  border-radius: 5px;
+  margin: 1rem 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.5rem;
 }
 
-.radio-list {
+.container .main-content form {
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.container .main-content form .num-inputs {
   display: flex;
-  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
   gap: 10px;
 }
 
-.radio-list .form-control {
+.container .main-content form .num-inputs:nth-child(1) {
+  width: 60%;
+}
+
+.container .main-content form .rad-inputs,
+.container hr,
+.container .main-content form .search-inputs {
+  margin: 1rem 0;
+}
+
+.container .main-content form .search-inputs {
+  width: 30%;
+}
+
+.container .main-content form .form-check {
+  font-size: 0.8rem;
+}
+
+.container .main-content form .form-check.parent {
+  padding: 1rem 0.5rem;
+  background-color: lightgray;
   display: flex;
-  gap: 5px;
+  align-items: center;
+  gap: 10px;
 }
 
-.radio-list .form-control input {
-  height: 1rem;
+.container .main-content form .form-check.childrens {
+  display: flex;
+  gap: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 1rem;
 }
 
-.warning {
-  background-color: orange;
-  border-color: orange;
-  color: white;
+.container .main-content form .form-check.parent label {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.container .main-content form .input-button {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
