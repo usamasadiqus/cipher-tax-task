@@ -205,7 +205,7 @@ const App = () => {
               <div className="input-button">
                 <Space wrap>
                   <Button className="warning" htmlType="submit">
-                    Apply to item(s)
+                    Apply tax to item(s)
                   </Button>
                 </Space>
               </div>
